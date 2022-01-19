@@ -17,6 +17,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.PersistableBundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -57,15 +58,19 @@ public class MainActivity extends AppCompatActivity {
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);// Show FullScreen
 
-        binding.myWebView.getSettings().setJavaScriptEnabled(true);
-        binding.myWebView.getSettings().setLoadWithOverviewMode(true);
-        binding.myWebView.getSettings().setUseWideViewPort(true);
-        binding.myWebView.getSettings().setDomStorageEnabled(true);
-        binding.myWebView.getSettings().setLoadsImagesAutomatically(true);
-        checkConnection();
-
+        if (savedInstanceState != null){
+            binding.myWebView.restoreState(savedInstanceState);
+        }else {
+            binding.myWebView.getSettings().setJavaScriptEnabled(true);
+            binding.myWebView.getSettings().setLoadWithOverviewMode(true);
+            binding.myWebView.getSettings().setUseWideViewPort(true);
+            binding.myWebView.getSettings().setDomStorageEnabled(true);
+            binding.myWebView.getSettings().setLoadsImagesAutomatically(true);
+            checkConnection();
+        }
+        // ADD Downloading Function
         binding.myWebView.setDownloadListener(new DownloadListener() {
-            @Override
+            @Override       // s = URL   ,  s1 = UserAgent ,  s2 = contentDisposition  ,  s3 = mimetype  , l = contentLength
             public void onDownloadStart(String s, String s1, String s2, String s3, long l) {
 
                 Dexter.withContext(MainActivity.this)
@@ -89,7 +94,6 @@ public class MainActivity extends AppCompatActivity {
                                 DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
                                 downloadManager.enqueue(request);
                                 Toast.makeText(MainActivity.this, "Downloading....", Toast.LENGTH_SHORT).show();
-
 
                             }
 
@@ -229,5 +233,11 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        binding.myWebView.saveState(outState);
     }
 }
