@@ -1,63 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:id="@+id/swipeRefreshLayout">
 
-   <ProgressBar
-       android:layout_width="match_parent"
-       android:layout_height="9dp"
-       android:id="@+id/progressBarWeb"
-       style="?android:attr/progressBarStyleHorizontal"
-       android:progress="20"
-       android:layout_marginTop="-2dp"
-       android:visibility="gone"
-       />
-
-   <WebView
+   <LinearLayout
        android:layout_width="match_parent"
        android:layout_height="match_parent"
-       android:id="@+id/myWebView"
-       />
+      android:orientation="vertical"
+      >
 
-   <RelativeLayout
-       android:layout_width="match_parent"
-       android:layout_height="match_parent"
-       android:id="@+id/relativeLayout">
-
-      <ImageView
-          android:layout_width="300dp"
-          android:layout_height="300dp"
-          android:src="@drawable/no_internet_connection"
-          android:id="@+id/noConnectionLogo"
-          android:layout_centerHorizontal="true"
-          android:contentDescription="@string/aboutImage"
+      <ProgressBar
+          android:layout_width="match_parent"
+          android:layout_height="9dp"
+          android:id="@+id/progressBarWeb"
+          style="?android:attr/progressBarStyleHorizontal"
+          android:progress="20"
+          android:layout_marginTop="-2dp"
+          android:visibility="gone"
           />
 
-      <TextView
+      <WebView
           android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:text="@string/no_internet_connection"
-          android:layout_below="@id/noConnectionLogo"
-          android:textAlignment="center"
-          android:textSize="26sp"
-          android:id="@+id/txtNoConnection"
-          android:gravity="center_horizontal" />
+          android:layout_height="match_parent"
+          android:id="@+id/myWebView"
+          />
 
-      <androidx.appcompat.widget.AppCompatButton
-          android:layout_width="140dp"
-          android:layout_height="55dp"
-          android:text="@string/retry"
-          android:background="@color/teal_700"
-          android:textColor="#fff"
-          android:textSize="22sp"
-          android:id="@+id/btnNoInternetConnection"
-          android:layout_below="@id/txtNoConnection"
-          android:layout_centerHorizontal="true"
-          android:layout_marginTop="60dp"/>
-   </RelativeLayout>
+      <RelativeLayout
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:id="@+id/relativeLayout">
 
-</LinearLayout>
+         <ImageView
+             android:layout_width="300dp"
+             android:layout_height="300dp"
+             android:src="@drawable/no_internet_connection"
+             android:id="@+id/noConnectionLogo"
+             android:layout_centerHorizontal="true"
+             android:contentDescription="@string/aboutImage"
+             />
+
+         <TextView
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:text="@string/no_internet_connection"
+             android:layout_below="@id/noConnectionLogo"
+             android:textAlignment="center"
+             android:textSize="26sp"
+             android:id="@+id/txtNoConnection"
+             android:gravity="center_horizontal" />
+
+         <androidx.appcompat.widget.AppCompatButton
+             android:layout_width="140dp"
+             android:layout_height="55dp"
+             android:text="@string/retry"
+             android:background="@color/teal_700"
+             android:textColor="#fff"
+             android:textSize="22sp"
+             android:id="@+id/btnNoInternetConnection"
+             android:layout_below="@id/txtNoConnection"
+             android:layout_centerHorizontal="true"
+             android:layout_marginTop="60dp"
+             />
+      </RelativeLayout>
+   </LinearLayout>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
