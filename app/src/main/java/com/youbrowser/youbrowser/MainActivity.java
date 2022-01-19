@@ -1,17 +1,23 @@
 package com.youbrowser.youbrowser;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
+import android.widget.Switch;
 
 import com.youbrowser.youbrowser.databinding.ActivityMainBinding;
 
@@ -110,5 +116,32 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu_toolbar, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int getId = item.getItemId();
+
+        switch(getId){
+            case R.id.main_menu_previous:
+                onBackPressed();
+                break;
+            case R.id.main_menu_next:
+                if (binding.myWebView.canGoForward()){
+                    binding.myWebView.goForward();
+                }
+                break;
+            case R.id.main_menu_reload:
+                checkConnection();
+                break;
+
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
