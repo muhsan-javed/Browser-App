@@ -4,8 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -85,7 +87,17 @@ public class MainActivity extends AppCompatActivity {
         if (binding.myWebView.canGoBack()){
             binding.myWebView.goBack();
         }else {
-            super.onBackPressed();
+            AlertDialog.Builder exitAlertDialog = new AlertDialog.Builder(this);
+            exitAlertDialog.setIcon(R.drawable.ic_baseline_exit_to_app_24);
+            exitAlertDialog.setMessage(R.string.exitAlertDialog);
+            exitAlertDialog.setTitle("Exit");
+            exitAlertDialog.setNegativeButton("No",null);
+            exitAlertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    finishAffinity();
+                }
+            }).show();
         }
     }
 
@@ -127,7 +139,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int getId = item.getItemId();
-
         switch(getId){
             case R.id.main_menu_previous:
                 onBackPressed();
@@ -140,7 +151,6 @@ public class MainActivity extends AppCompatActivity {
             case R.id.main_menu_reload:
                 checkConnection();
                 break;
-
         }
         return super.onOptionsItemSelected(item);
     }
