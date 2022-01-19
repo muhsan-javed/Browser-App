@@ -4,4 +4,7 @@
     <string name="aboutImage">This Image Show No Connection with user understud</string>
     <string name="retry">Retry</string>
     <string name="exitAlertDialog">Are you sure you want to Exit</string>
+    <string name="reload">reload</string>
+    <string name="previous">previous</string>
+    <string name="next">next</string>
 </resources>

@@ -13,8 +13,7 @@
         android:src="@drawable/no_internet_connection"
         android:padding="50dp"
         android:layout_marginTop="30dp"
-
-        />
+        android:contentDescription="@string/aboutImage" />
 
     <ProgressBar
         android:layout_width="220dp"

@@ -2,15 +2,12 @@ package com.youbrowser.youbrowser;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -23,39 +20,31 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.CookieManager;
-import android.webkit.DownloadListener;
 import android.webkit.URLUtil;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.RelativeLayout;
-import android.widget.Switch;
 import android.widget.Toast;
-
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.single.BasePermissionListener;
 import com.karumi.dexter.listener.single.PermissionListener;
 import com.youbrowser.youbrowser.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
 
-    private String webUrl = "https://google.com/";
+    String webUrl = "https://google.com/";
     ActivityMainBinding binding;
     ProgressDialog progressDialog; // This Progress Dialog show Beale UI
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-        //if () // Testing
-        //getSupportActionBar().setTitle();
-
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);// Show FullScreen
 
         if (savedInstanceState != null){
@@ -69,58 +58,47 @@ public class MainActivity extends AppCompatActivity {
             checkConnection();
         }
         // ADD Downloading Function
-        binding.myWebView.setDownloadListener(new DownloadListener() {
-            @Override       // s = URL   ,  s1 = UserAgent ,  s2 = contentDisposition  ,  s3 = mimetype  , l = contentLength
-            public void onDownloadStart(String s, String s1, String s2, String s3, long l) {
+        // s = URL   ,  s1 = UserAgent ,  s2 = contentDisposition  ,  s3 = mime type  , l = contentLength
+        binding.myWebView.setDownloadListener((s, s1, s2, s3, l) -> Dexter.withContext(MainActivity.this)
+                .withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .withListener(new PermissionListener() {
+                    @Override
+                    public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
 
-                Dexter.withContext(MainActivity.this)
-                        .withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        .withListener(new PermissionListener() {
-                            @Override
-                            public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
+                        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(s));
+                        request.setMimeType(s3);
+                        String cookies = CookieManager.getInstance().getCookie(s);
+                        request.addRequestHeader("cookie",cookies);
+                        request.addRequestHeader("User-Agent",s1);
+                        request.setDescription("Downloading File....");
+                        request.setTitle(URLUtil.guessFileName(s,s2,s3));
+                        request.allowScanningByMediaScanner();
+                        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                        request.setDestinationInExternalPublicDir(
+                                Environment.DIRECTORY_DOWNLOADS, URLUtil.guessFileName(s,s2,s3));
 
-                                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(s));
-                                request.setMimeType(s3);
-                                String cookies = CookieManager.getInstance().getCookie(s);
-                                request.addRequestHeader("cookie",cookies);
-                                request.addRequestHeader("User-Agent",s1);
-                                request.setDescription("Downloading File....");
-                                request.setTitle(URLUtil.guessFileName(s,s2,s3));
-                                request.allowScanningByMediaScanner();
-                                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                                request.setDestinationInExternalPublicDir(
-                                        Environment.DIRECTORY_DOWNLOADS, URLUtil.guessFileName(s,s2,s3));
+                        DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                        downloadManager.enqueue(request);
+                        Toast.makeText(MainActivity.this, "Downloading....", Toast.LENGTH_SHORT).show();
 
-                                DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-                                downloadManager.enqueue(request);
-                                Toast.makeText(MainActivity.this, "Downloading....", Toast.LENGTH_SHORT).show();
+                    }
 
-                            }
+                    @Override
+                    public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
 
-                            @Override
-                            public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
+                    }
 
-                            }
-
-                            @Override
-                            public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
-                                permissionToken.continuePermissionRequest();
-                            }
-                        }).check();
-
-            }
-        });
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
+                        permissionToken.continuePermissionRequest();
+                    }
+                }).check());
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Loading Please Wait");
 
         binding.swipeRefreshLayout.setColorSchemeColors(Color.BLUE,Color.YELLOW,Color.GREEN);
-        binding.swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                binding.myWebView.reload();
-            }
-        });
+        binding.swipeRefreshLayout.setOnRefreshListener(() -> binding.myWebView.reload());
         // Open website your app
         binding.myWebView.setWebViewClient(new WebViewClient(){
             @Override
@@ -139,7 +117,6 @@ public class MainActivity extends AppCompatActivity {
         binding.myWebView.setWebChromeClient( new WebChromeClient(){
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
-
                 binding.progressBarWeb.setVisibility(View.VISIBLE);
                 binding.progressBarWeb.setProgress(newProgress);
                 setTitle("Loading...");
@@ -152,13 +129,7 @@ public class MainActivity extends AppCompatActivity {
                 super.onProgressChanged(view, newProgress);
             }
         });
-
-        binding.btnNoInternetConnection.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                checkConnection();
-            }
-        });
+        binding.btnNoInternetConnection.setOnClickListener(view -> checkConnection());
 
     }
 
@@ -172,20 +143,13 @@ public class MainActivity extends AppCompatActivity {
             exitAlertDialog.setMessage(R.string.exitAlertDialog);
             exitAlertDialog.setTitle("Exit");
             exitAlertDialog.setNegativeButton("No",null);
-            exitAlertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    finishAffinity();
-                }
-            }).show();
+            exitAlertDialog.setPositiveButton("Yes", (dialogInterface, i) -> finishAffinity()).show();
         }
     }
 
     public void checkConnection(){
-
         ConnectivityManager connectivityManager = (ConnectivityManager)
                 this.getSystemService(Context.CONNECTIVITY_SERVICE);
-
         NetworkInfo wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         NetworkInfo mobileNetwork = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
 
@@ -193,21 +157,14 @@ public class MainActivity extends AppCompatActivity {
             binding.myWebView.loadUrl(webUrl);
             binding.myWebView.setVisibility(View.VISIBLE);
             binding.relativeLayout.setVisibility(View.GONE);
-
-        }
-        else if (mobileNetwork.isConnected()){
+        }else if (mobileNetwork.isConnected()){
             binding.myWebView.loadUrl(webUrl);
             binding.myWebView.setVisibility(View.VISIBLE);
             binding.relativeLayout.setVisibility(View.GONE);
-
-        }
-        else {
+        }else {
             binding.myWebView.setVisibility(View.GONE);
             binding.relativeLayout.setVisibility(View.VISIBLE);
-//            setTitle("Tun On the Internet"); // Testing
-
         }
-
     }
 
     @Override
@@ -216,6 +173,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int getId = item.getItemId();
