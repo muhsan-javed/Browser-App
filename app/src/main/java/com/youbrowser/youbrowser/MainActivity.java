@@ -4,25 +4,40 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.webkit.CookieManager;
+import android.webkit.DownloadListener;
+import android.webkit.URLUtil;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
+import android.widget.Toast;
 
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.BasePermissionListener;
+import com.karumi.dexter.listener.single.PermissionListener;
 import com.youbrowser.youbrowser.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
@@ -43,7 +58,55 @@ public class MainActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);// Show FullScreen
 
         binding.myWebView.getSettings().setJavaScriptEnabled(true);
+        binding.myWebView.getSettings().setLoadWithOverviewMode(true);
+        binding.myWebView.getSettings().setUseWideViewPort(true);
+        binding.myWebView.getSettings().setDomStorageEnabled(true);
+        binding.myWebView.getSettings().setLoadsImagesAutomatically(true);
         checkConnection();
+
+        binding.myWebView.setDownloadListener(new DownloadListener() {
+            @Override
+            public void onDownloadStart(String s, String s1, String s2, String s3, long l) {
+
+                Dexter.withContext(MainActivity.this)
+                        .withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        .withListener(new PermissionListener() {
+                            @Override
+                            public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
+
+                                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(s));
+                                request.setMimeType(s3);
+                                String cookies = CookieManager.getInstance().getCookie(s);
+                                request.addRequestHeader("cookie",cookies);
+                                request.addRequestHeader("User-Agent",s1);
+                                request.setDescription("Downloading File....");
+                                request.setTitle(URLUtil.guessFileName(s,s2,s3));
+                                request.allowScanningByMediaScanner();
+                                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                                request.setDestinationInExternalPublicDir(
+                                        Environment.DIRECTORY_DOWNLOADS, URLUtil.guessFileName(s,s2,s3));
+
+                                DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                                downloadManager.enqueue(request);
+                                Toast.makeText(MainActivity.this, "Downloading....", Toast.LENGTH_SHORT).show();
+
+
+                            }
+
+                            @Override
+                            public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
+
+                            }
+
+                            @Override
+                            public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
+                                permissionToken.continuePermissionRequest();
+                            }
+                        }).check();
+
+            }
+        });
+
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Loading Please Wait");
 
@@ -82,7 +145,6 @@ public class MainActivity extends AppCompatActivity {
                     setTitle(view.getTitle());
                     progressDialog.dismiss();
                 }
-
                 super.onProgressChanged(view, newProgress);
             }
         });
