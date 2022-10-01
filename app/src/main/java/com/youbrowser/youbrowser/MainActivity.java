@@ -35,7 +35,7 @@ import com.youbrowser.youbrowser.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
 
-    String webUrl = "https://google.com/";
+    String webUrl = "https://youtube.com/";
     ActivityMainBinding binding;
     ProgressDialog progressDialog; // This Progress Dialog show Beale UI
 
@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);// Show FullScreen
 
         if (savedInstanceState != null){
@@ -117,15 +118,18 @@ public class MainActivity extends AppCompatActivity {
         binding.myWebView.setWebChromeClient( new WebChromeClient(){
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
+
                 binding.progressBarWeb.setVisibility(View.VISIBLE);
                 binding.progressBarWeb.setProgress(newProgress);
                 setTitle("Loading...");
                 progressDialog.show();
+
                 if (newProgress == 100){
                     binding.progressBarWeb.setVisibility(View.GONE);
                     setTitle(view.getTitle());
                     progressDialog.dismiss();
                 }
+
                 super.onProgressChanged(view, newProgress);
             }
         });
