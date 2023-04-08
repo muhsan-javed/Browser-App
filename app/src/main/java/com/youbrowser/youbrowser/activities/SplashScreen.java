@@ -20,7 +20,7 @@ public class SplashScreen extends AppCompatActivity {
         binding = ActivitySplashScreenBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         Objects.requireNonNull(getSupportActionBar()).hide();
 

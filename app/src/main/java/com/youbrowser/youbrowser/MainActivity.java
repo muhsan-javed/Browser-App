@@ -1,14 +1,11 @@
 package com.youbrowser.youbrowser;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -18,13 +15,16 @@ import android.os.PersistableBundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.webkit.CookieManager;
 import android.webkit.URLUtil;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
@@ -33,12 +33,12 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 import com.youbrowser.youbrowser.databinding.ActivityMainBinding;
 
+
 public class MainActivity extends AppCompatActivity {
 
-    String webUrl = "https://youtube.com/";
+    String webUrl = "https://google.com/";
     ActivityMainBinding binding;
     ProgressDialog progressDialog; // This Progress Dialog show Beale UI
-
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);// Show FullScreen
+        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);// Show FullScreen
 
         if (savedInstanceState != null){
             binding.myWebView.restoreState(savedInstanceState);
@@ -98,13 +98,13 @@ public class MainActivity extends AppCompatActivity {
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Loading Please Wait");
 
-        binding.swipeRefreshLayout.setColorSchemeColors(Color.BLUE,Color.YELLOW,Color.GREEN);
-        binding.swipeRefreshLayout.setOnRefreshListener(() -> binding.myWebView.reload());
+//        binding.swipeRefreshLayout.setColorSchemeColors(Color.BLUE,Color.YELLOW,Color.GREEN);
+//        binding.swipeRefreshLayout.setOnRefreshListener(() -> binding.myWebView.reload());
         // Open website your app
         binding.myWebView.setWebViewClient(new WebViewClient(){
             @Override
             public void onPageFinished(WebView view, String url) {
-                binding.swipeRefreshLayout.setRefreshing(false);
+//                binding.swipeRefreshLayout.setRefreshing(false);
                 super.onPageFinished(view, url);
             }
 
@@ -136,7 +136,6 @@ public class MainActivity extends AppCompatActivity {
         binding.btnNoInternetConnection.setOnClickListener(view -> checkConnection());
 
     }
-
     @Override
     public void onBackPressed() {
         if (binding.myWebView.canGoBack()){
@@ -152,8 +151,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void checkConnection(){
-        ConnectivityManager connectivityManager = (ConnectivityManager)
-                this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         NetworkInfo mobileNetwork = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
 
